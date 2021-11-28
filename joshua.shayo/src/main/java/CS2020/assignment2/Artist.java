@@ -12,12 +12,19 @@ public class Artist
     private String placeOfBirth;
     private ArrayList<Song> songs = new ArrayList<Song>();
     
-    Artist (String firstName, String lastName, String dob, String placeOfBirth){
+    Artist (String first, String last, String dateOfBirth, String pob){
         artistID = UUID.randomUUID();
-        firstName = firstName;
-        lastName = lastName;
-        dob = dob;
-        placeOfBirth = placeOfBirth;
+        firstName = first;
+        lastName = last;
+        dob = dateOfBirth;
+        placeOfBirth = pob;
+    }
+    Artist (UUID id, String first, String last, String dateOfBirth, String pob){
+        artistID = id;
+        firstName = first;
+        lastName = last;
+        dob = dateOfBirth;
+        placeOfBirth = pob;
     }
 
     // Getter classes
