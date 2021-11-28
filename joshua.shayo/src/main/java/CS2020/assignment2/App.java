@@ -1,6 +1,7 @@
 package CS2020.assignment2;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -9,10 +10,45 @@ import java.awt.event.*;
 
 public class App {
     
+    protected static JFrame frame;
+    
+    protected static JMenuBar menuBar;
+    protected static JMenuItem about;
+    protected static JMenuItem data;
+    protected static JMenuItem expCSV;
+    
+    
+    protected static JList<Artist> list;
+    protected static JScrollPane scroll;
+    
+    
+    protected static JButton adm;
+    protected static JButton adfd;
+    
+    
+    protected static JPanel detailsPanel;
+    
+    protected static JPanel topTFPanel;
+    protected static JPanel dobPanel;
+    protected static JLabel dobL;
+    protected static JTextField dobTF;
+    protected static JPanel pobPanel;
+    protected static JLabel pobL;
+    protected static JTextField pobTF;
+    protected static JPanel bowPanel;
+    protected static JLabel bowL;
+    protected static JTextField bowTF;
+    
+    
+    protected static JTextArea stf;
+    protected static JScrollPane stfPanel;
+    
+    
     public static void main( String[] args ) {
         SwingUtilities.invokeLater(new Runnable(){
             public void run() {
-                generateAndDisplayGUI();
+                App songApp = new App();
+                songApp.generateAndDisplayGUI();
             }
         });
         
@@ -22,7 +58,7 @@ public class App {
     }
     
     private static void generateAndDisplayGUI(){
-        JFrame frame = new JFrame("Joshua Shayo : assignment2");
+        frame = new JFrame("Joshua Shayo : assignment2");
         
         
         frame.setSize(800,600);
@@ -32,31 +68,32 @@ public class App {
         
         
         
-        JMenuBar menuBar = new JMenuBar();
+        menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
         
-        JMenuItem about = new JMenuItem("About");
+        about = new JMenuItem("About");
         about.addActionListener(new AboutAction());
         menuBar.add(about);
         
-        JMenuItem data = new JMenuItem("Data");
+        data = new JMenuItem("Data");
         menuBar.add(data);
-//         data.addActionListener(this);
         
-        JMenuItem expCSV = new JMenuItem("Export to CSV");
+        expCSV = new JMenuItem("Export to CSV");
         menuBar.add(expCSV);
-//         expCSV.addActionListener(this);
         
         
         //Scrollable list
-        JList<Artist> list = new JList<Artist>();
+        
+        list = new JList<Artist>();
         
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        Utils.readArtistAndSongsFromDatabase(list);
+        list.setLayoutOrientation (JList.VERTICAL);
+        list.addListSelectionListener(new ArtistSelection());
         
-        JScrollPane scroll = new JScrollPane(list);
-        scroll.setPreferredSize(new Dimension(550,80));
+        scroll = new JScrollPane(list);
+        
         scroll.setVerticalScrollBarPolicy(scroll.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll.setHorizontalScrollBarPolicy(scroll.HORIZONTAL_SCROLLBAR_NEVER);
         
         frame.add(scroll, BorderLayout.CENTER);
         
@@ -66,10 +103,13 @@ public class App {
         JPanel buttonPanel = new JPanel();
         
         //Create and add buttons to the button panel
-        JButton adm = new JButton("Add Data Manually");
+        adm = new JButton("Add Data Manually");
         buttonPanel.add(adm, BorderLayout.WEST);
-        JButton adfd = new JButton("Add Data From Database");
+        adm.addActionListener(new AddDataManually());
+        
+        adfd = new JButton("Add Data From Database");
         buttonPanel.add(adfd, BorderLayout.CENTER);
+        adfd.addActionListener(new AddDataFromDatabase());
         JButton ds = new JButton("Delete Selected");
         buttonPanel.add(ds, BorderLayout.EAST);
         
@@ -79,20 +119,21 @@ public class App {
         //Detail Pane
         
         //Panel for artist details
-        JPanel detailsPanel = new JPanel();
+        detailsPanel = new JPanel();
         detailsPanel.setPreferredSize(new Dimension(250,500));
         
         //Panel for text fields at the top
-        JPanel topTFPanel = new JPanel();
+        topTFPanel = new JPanel();
         topTFPanel.setPreferredSize(new Dimension(250,100));
         
         //Panel for Date of birth
-        JPanel dobPanel = new JPanel();
+        dobPanel = new JPanel();
         dobPanel.setLayout(new BorderLayout());
         dobPanel.setPreferredSize(new Dimension(250,20));
         //Populate panel for Date of Birth
-        JLabel dobL = new JLabel("Date Of Birth:");
-        JTextField dobTF = new JTextField();
+        dobL = new JLabel("Date Of Birth:");
+        dobTF = new JTextField();
+        dobTF.setEditable(false);
         dobTF.setPreferredSize(new Dimension(100,20));
         
         dobPanel.add(dobL, BorderLayout.WEST);
@@ -101,12 +142,13 @@ public class App {
         topTFPanel.add(dobPanel);
         
         //Panel for Place of birth
-        JPanel pobPanel = new JPanel();
+        pobPanel = new JPanel();
         pobPanel.setLayout(new BorderLayout());
         pobPanel.setPreferredSize(new Dimension(250,20));
         //Populate panel for Place of Birth
-        JLabel pobL = new JLabel("Place Of Birth:");
-        JTextField pobTF = new JTextField();
+        pobL = new JLabel("Place Of Birth:");
+        pobTF = new JTextField();
+        pobTF.setEditable(false);
         pobTF.setPreferredSize(new Dimension(100,20));
         pobPanel.add(pobL, BorderLayout.WEST);
         pobPanel.add(pobTF, BorderLayout.EAST);
@@ -114,12 +156,13 @@ public class App {
         topTFPanel.add(pobPanel);
         
         //Panel for Born on Weekend
-        JPanel bowPanel = new JPanel();
+        bowPanel = new JPanel();
         bowPanel.setLayout(new BorderLayout());
         pobPanel.setPreferredSize(new Dimension(250,20));
         //Populate panel for Born on Weekend
-        JLabel bowL = new JLabel("Born on Weekend:");
-        JTextField bowTF = new JTextField();
+        bowL = new JLabel("Born on Weekend:");
+        bowTF = new JTextField();
+        bowTF.setEditable(false);
         bowTF.setPreferredSize(new Dimension(100,20));
         bowPanel.add(bowL, BorderLayout.WEST);
         bowPanel.add(bowTF, BorderLayout.EAST);
@@ -130,15 +173,15 @@ public class App {
         detailsPanel.add(topTFPanel, BorderLayout.NORTH);
         
         //Panel for scrollable text field
-        JTextField stf = new JTextField();
-        JScrollPane stfPanel = new JScrollPane(stf);
+        stf = new JTextArea();
+        stf.setEditable(false);
+        stfPanel = new JScrollPane(stf);
         stfPanel.setPreferredSize(new Dimension(250,400));
         
         detailsPanel.add(stfPanel, BorderLayout.SOUTH);
         
         
         frame.add(detailsPanel, BorderLayout.EAST);
-        
         
         
         
@@ -149,6 +192,41 @@ public class App {
     static class AboutAction implements ActionListener{
         public void actionPerformed (ActionEvent e){
             JOptionPane.showMessageDialog(null, "Assignment 2 App v.0.1", "About", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    static class AddDataManually implements ActionListener{
+        public void actionPerformed (ActionEvent e){
+            Utils.createExampleArtists(list);
+            adm.setEnabled(false);
+        }
+    }
+    
+    static class AddDataFromDatabase implements ActionListener{
+        public void actionPerformed (ActionEvent e){
+            Utils.readArtistAndSongsFromDatabase(list);
+            adfd.setEnabled(false);
+        }
+    }
+    
+    static class ArtistSelection implements ListSelectionListener {
+        public void valueChanged(ListSelectionEvent v){
+            Artist artist = (Artist) list.getSelectedValue();
+            
+            String songsText= "";
+            int songCount = 1;
+            for(Song s:artist.getSongs()){
+                songsText += (songCount++ + ". " + s.getTitle() + " (" + s.getDuration() +")\n");
+            }
+            
+            
+            dobTF.setText(artist.getDateOfBirth());
+            pobTF.setText(artist.getPlaceOfBirth());
+            bowTF.setText((Utils.checkIfBornOnWeekend(artist.getDateOfBirth()) ? "Yes":"No"));
+            stf.setText(songsText);
+            
+            
+            
         }
     }
     

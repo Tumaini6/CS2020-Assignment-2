@@ -26,6 +26,11 @@ public class Artist
         dob = dateOfBirth;
         placeOfBirth = pob;
     }
+    
+    @Override
+    public String toString() {
+        return firstName + " " + lastName;
+    }
 
     // Getter classes
     public UUID getArtistID(){
@@ -40,7 +45,7 @@ public class Artist
         return lastName;
     }
 
-    public String getDob(){
+    public String getDateOfBirth(){
         return dob;
     }
 

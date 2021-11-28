@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.HashMap;
 import java.time.LocalDate;
 import java.time.DayOfWeek;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JList;
 import javax.swing.DefaultListModel;
 import java.sql.*;
@@ -19,17 +20,18 @@ public class Utils
     }
     
     public static boolean checkIfBornOnWeekend(String dobOfArtist){
-        DayOfWeek day = LocalDate.parse(dobOfArtist).getDayOfWeek();
-        return day.equals("SATURDAY") || day.equals("SUNDAY");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MMM-yyyy");
+        DayOfWeek day = LocalDate.parse(dobOfArtist.replace(" ", "-"), formatter).getDayOfWeek();
+        return day.equals(DayOfWeek.SATURDAY) || day.equals(DayOfWeek.SUNDAY);
     }
     
     public static void createExampleArtists(JList<Artist> list){
         DefaultListModel tempList = new DefaultListModel();
         // create the example artists
-        Artist example1 = new Artist("Calvin", "Broadus*", "10 Oct 1971", "Long Beach, California, United States");
-        Artist example2 = new Artist("Bill", "Kapri*", "11 Jun 1997", "Pompano Beach, Florida, United States");
+        Artist example1 = new Artist("Calvin", "Broadus*", "10 Oct 1971", "California");
+        Artist example2 = new Artist("Bill", "Kapri*", "11 Jun 1997", "Florida");
         Artist example3 = new Artist("David", "Jones*", "8 Jan 1947", "London");
-        Artist example4 = new Artist("Eunice", "Waymon*", "21 Feb 1933", "Tryon, North Carolina, United States");
+        Artist example4 = new Artist("Eunice", "Waymon*", "21 Feb 1933", "North Carolina");
         
         // populate their songs arrays
         example1.addSong(new Song(example1.getArtistID(), "Vato", 283));
@@ -53,11 +55,14 @@ public class Utils
         example4.addSong(new Song(example4.getArtistID(), "Baltimore", 278));
         
         // add example artists to the JList
+        for(int i = 0; i<list.getModel().getSize(); i++){
+            tempList.addElement(list.getModel().getElementAt(i));
+        }
         tempList.addElement(example1);
         tempList.addElement(example2);
         tempList.addElement(example3);
         tempList.addElement(example4);
-        list = new JList<Artist> (tempList);
+        list.setModel(tempList);
         
         
     }
@@ -80,6 +85,9 @@ public class Utils
     public static void readArtistAndSongsFromDatabase(JList<Artist> list){
         DefaultListModel tempList = new DefaultListModel();
         Connection c = connectToDatabase();
+        for(int i = 0; i<list.getModel().getSize(); i++){
+            tempList.addElement(list.getModel().getElementAt(i));
+        }
         try{
 //             c.setAutoCommit(false);
             Statement stmt1 = c.createStatement();
@@ -96,11 +104,11 @@ public class Utils
                 }
                 
 
-                Artist artist = new Artist(UUID.fromString(artistID.strip()), name.get(0), name.get(1), artistsResults.getString("dob"), artistsResults.getString("placeOfBirth"));
+                Artist artist = new Artist(UUID.fromString(artistID.strip()), name.get(0), name.get(1), artistsResults.getString("dob").strip(), artistsResults.getString("placeOfBirth").strip());
 
                 ResultSet songsResults = c.createStatement().executeQuery("SELECT * FROM Song WHERE artistID = '" + artistID + "'");
                 while (songsResults.next()) {
-                    artist.addSong(new Song(UUID.fromString(songsResults.getString("songID").strip()), UUID.fromString(artistID.strip()), songsResults.getString("title"), songsResults.getInt("duration")));
+                    artist.addSong(new Song(UUID.fromString(songsResults.getString("songID").strip()), UUID.fromString(artistID.strip()), songsResults.getString("title").strip(), songsResults.getInt("duration")));
                 }
                 tempList.addElement(artist);
             }
@@ -108,9 +116,7 @@ public class Utils
             System.out.println(e);
         }
         
-        
-        
-        list = new JList<Artist> (tempList);
+        list.setModel(tempList);
     }
     
 }
