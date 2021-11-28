@@ -15,6 +15,13 @@ public class Song
         title = titleForSong;
         duration = durationOfSong;
     }
+    
+    Song(UUID id, UUID IDOfArtist, String titleForSong, int durationOfSong){
+        songID = id;
+        artistID = IDOfArtist;
+        title = titleForSong;
+        duration = durationOfSong;
+    }
 
     // Getter classes
     public UUID getSongID(){
