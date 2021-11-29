@@ -10,21 +10,41 @@ import javax.swing.JList;
 import javax.swing.DefaultListModel;
 import java.sql.*;
 
+
+/**
+ * A class with various tools used in other classes
+ * 
+ * @author Joshua Shayo
+ * @version 1.0
+*/
 public class Utils
 {
-    
+    /**
+     * Takes an array list of songs and converts it to a HashMap with a formatted verison of the songs list
+     * @param songList and ArrayList of songs
+     * @return the HashMap formatted form of the song list
+     */
     public static HashMap<UUID, String> returnSongDurationAndTitleFormatted(ArrayList<Song> songList){
         HashMap<UUID, String> songHashMap = new HashMap<UUID, String>();
         songList.forEach((song) -> {songHashMap.put(song.getSongID(), song.getTitle() + " (" + song.getDuration()/60 + ":" + song.getDuration()%60 + ")");});
         return songHashMap;
     }
     
+    /**
+     * Given a date will determine if it lands on a weekend or not
+     * @param dobOfArtist the date to check
+     * @return weather the date lands on a weekend
+     */
     public static boolean checkIfBornOnWeekend(String dobOfArtist){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MMM-yyyy");
         DayOfWeek day = LocalDate.parse(dobOfArtist.replace(" ", "-"), formatter).getDayOfWeek();
         return day.equals(DayOfWeek.SATURDAY) || day.equals(DayOfWeek.SUNDAY);
     }
     
+    /**
+     * Populates a given JList with a sample of Artist data
+     * @param list JList to be populated 
+     */
     public static void createExampleArtists(JList<Artist> list){
         ArtistListModel tempList = new ArtistListModel();
         // create the example artists
@@ -69,6 +89,10 @@ public class Utils
         
     }
     
+    /**
+     * Establishes a connection to the CS2020-assignment2 database
+     * @return the connection to the database
+     */
     public static Connection connectToDatabase(){
         Connection sqlConnect = null;
         
@@ -84,6 +108,10 @@ public class Utils
         
     }
     
+    /**
+     * Populates a given JList with data from the CS2020-assignment2 database
+     * @param list JList to be populated 
+     */
     public static void readArtistAndSongsFromDatabase(JList<Artist> list){
         ArtistListModel tempList = new ArtistListModel();
         Connection c = connectToDatabase();
@@ -91,7 +119,6 @@ public class Utils
             tempList.addElement(list.getModel().getElementAt(i));
         }
         try{
-//             c.setAutoCommit(false);
             Statement stmt1 = c.createStatement();
             ResultSet artistsResults = stmt1.executeQuery("SELECT * FROM Artist");
             while (artistsResults.next() ) {
@@ -123,6 +150,9 @@ public class Utils
     
 }
 
+/**
+ * Extends the DefaultListModel class to add sorting functionality
+ */
 class ArtistListModel extends DefaultListModel{
     public void sortElements(){
         boolean sorted = false;

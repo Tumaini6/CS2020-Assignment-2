@@ -7,8 +7,12 @@ import java.awt.event.*;
 import javax.swing.DefaultListModel;
 
 
-
-
+/**
+ * The main class for CS2020 assignment2
+ * 
+ * @author Joshua Shayo
+ * @version 1.0
+*/
 public class App {
     
     protected static JFrame frame;
@@ -45,7 +49,13 @@ public class App {
     protected static JTextArea stf;
     protected static JScrollPane stfPanel;
     
+    protected static JPopupMenu popup;
+    protected static JMenuItem delete;
     
+    /**
+     * Main method for App
+     * @param args arguments for main method
+     */
     public static void main( String[] args ) {
         SwingUtilities.invokeLater(new Runnable(){
             public void run() {
@@ -59,6 +69,9 @@ public class App {
         
     }
     
+    /**
+     * initializes all of the gui elements
+     */
     private static void generateAndDisplayGUI(){
         frame = new JFrame("Joshua Shayo : assignment2");
         
@@ -83,6 +96,11 @@ public class App {
         expCSV = new JMenuItem("Export to CSV");
         menuBar.add(expCSV);
         
+        //Popup menu
+        popup = new JPopupMenu();
+        delete = new JMenuItem("Delete Selected Item");
+        delete.addActionListener(new DeleteSelected());
+        
         
         //Scrollable list
         
@@ -91,6 +109,14 @@ public class App {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setLayoutOrientation (JList.VERTICAL);
         list.addListSelectionListener(new ArtistSelection());
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked( MouseEvent e ){
+                if (SwingUtilities.isRightMouseButton(e) && e.getClickCount() == 1){
+                    popup.show(frame , e.getX(), e.getY());
+                }
+            }
+        });
         
         scroll = new JScrollPane(list);
         
@@ -187,8 +213,6 @@ public class App {
         
         frame.add(detailsPanel, BorderLayout.EAST);
         
-        
-        
         frame.setVisible(true);
         
     }
@@ -240,6 +264,7 @@ public class App {
     static class ArtistSelection implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent v){
             ds.setEnabled(true);
+            popup.add(delete);
             Artist artist = (Artist) list.getSelectedValue();
             
             String songsText= "";
