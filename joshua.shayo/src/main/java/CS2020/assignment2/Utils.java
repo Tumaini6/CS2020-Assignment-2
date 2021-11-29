@@ -26,7 +26,7 @@ public class Utils
     }
     
     public static void createExampleArtists(JList<Artist> list){
-        DefaultListModel tempList = new DefaultListModel();
+        ArtistListModel tempList = new ArtistListModel();
         // create the example artists
         Artist example1 = new Artist("Calvin", "Broadus*", "10 Oct 1971", "California");
         Artist example2 = new Artist("Bill", "Kapri*", "11 Jun 1997", "Florida");
@@ -62,6 +62,8 @@ public class Utils
         tempList.addElement(example2);
         tempList.addElement(example3);
         tempList.addElement(example4);
+        
+        tempList.sortElements();
         list.setModel(tempList);
         
         
@@ -83,7 +85,7 @@ public class Utils
     }
     
     public static void readArtistAndSongsFromDatabase(JList<Artist> list){
-        DefaultListModel tempList = new DefaultListModel();
+        ArtistListModel tempList = new ArtistListModel();
         Connection c = connectToDatabase();
         for(int i = 0; i<list.getModel().getSize(); i++){
             tempList.addElement(list.getModel().getElementAt(i));
@@ -115,8 +117,30 @@ public class Utils
         }catch (SQLException e) {
             System.out.println(e);
         }
-        
+        tempList.sortElements();
         list.setModel(tempList);
     }
     
+}
+
+class ArtistListModel extends DefaultListModel{
+    public void sortElements(){
+        boolean sorted = false;
+        Artist current;
+        Artist next;
+        Object temp;
+        while(!sorted) {
+            sorted = true;
+            for (int i = 0; i < this.getSize() - 1; i++) {
+                current = (Artist)this.getElementAt(i);
+                next = (Artist)this.getElementAt(i+1);
+                if (current.getFirstName().compareTo(next.getFirstName())>0) {
+                    temp = this.getElementAt(i);
+                    this.setElementAt(this.getElementAt(i+1) ,i);
+                    this.setElementAt(temp, i+1);
+                    sorted = false;
+                }
+            }
+        }
+    }
 }

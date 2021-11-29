@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
-Test set: CS2020.assignment2.AppTest
+Test set: CS2020.assignment2.UtilsTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s - in CS2020.assignment2.AppTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.142 s - in CS2020.assignment2.UtilsTest
