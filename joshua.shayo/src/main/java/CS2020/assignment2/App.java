@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.DefaultListModel;
 
 
 
@@ -24,6 +25,7 @@ public class App {
     
     protected static JButton adm;
     protected static JButton adfd;
+    protected static JButton ds;
     
     
     protected static JPanel detailsPanel;
@@ -110,7 +112,9 @@ public class App {
         adfd = new JButton("Add Data From Database");
         buttonPanel.add(adfd, BorderLayout.CENTER);
         adfd.addActionListener(new AddDataFromDatabase());
-        JButton ds = new JButton("Delete Selected");
+        ds = new JButton("Delete Selected");
+        ds.addActionListener(new DeleteSelected());
+        ds.setEnabled(false);
         buttonPanel.add(ds, BorderLayout.EAST);
         
         //Add button panel to the main frame
@@ -209,8 +213,33 @@ public class App {
         }
     }
     
+    static class DeleteSelected implements ActionListener{
+        public void actionPerformed (ActionEvent e){
+            String[] options = {"Cancel", "No", "Yes"};
+            int conformation = JOptionPane.showOptionDialog(null, "Are you sure?", "Select an Option", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+            if (conformation == 2){
+                list.removeListSelectionListener(list.getListSelectionListeners()[0]);
+                DefaultListModel model = new DefaultListModel();
+                int index = list.getSelectedIndex();
+                for(int i = 0; i<list.getModel().getSize(); i++){
+                    model.addElement(list.getModel().getElementAt(i));
+                }
+                model.removeElementAt(index);
+
+                if(model.size() == 0){
+                    ds.setEnabled(false);
+                }
+
+                list.setModel(model);
+                list.addListSelectionListener(new ArtistSelection());
+                list.setSelectedIndex(0);
+            }
+        }
+    }
+    
     static class ArtistSelection implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent v){
+            ds.setEnabled(true);
             Artist artist = (Artist) list.getSelectedValue();
             
             String songsText= "";
