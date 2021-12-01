@@ -26,7 +26,7 @@ public class Utils
      */
     public static HashMap<UUID, String> returnSongDurationAndTitleFormatted(ArrayList<Song> songList){
         HashMap<UUID, String> songHashMap = new HashMap<UUID, String>();
-        songList.forEach((song) -> {songHashMap.put(song.getSongID(), song.getTitle() + " (" + song.getDuration()/60 + ":" + song.getDuration()%60 + ")");});
+        songList.forEach((song) -> {songHashMap.put(song.getSongID(), song.getTitle() + " (" + song.getDuration()/60 + ":" + song.getDuration()%60 + ")\n");});
         return songHashMap;
     }
     

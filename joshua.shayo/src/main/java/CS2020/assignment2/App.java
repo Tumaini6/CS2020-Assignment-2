@@ -5,6 +5,13 @@ import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.DefaultListModel;
+import javax.swing.ListModel;
+import java.io.*;
+import com.opencsv.CSVWriter;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.HashMap;
 
 
 /**
@@ -52,6 +59,8 @@ public class App {
     protected static JPopupMenu popup;
     protected static JMenuItem delete;
     
+    protected static JPopupMenu detailsPopup;
+    
     /**
      * Main method for App
      * @param args arguments for main method
@@ -79,11 +88,13 @@ public class App {
         frame.setSize(800,600);
         frame.setLayout(new BorderLayout());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
         
         
         
         
         menuBar = new JMenuBar();
+        menuBar.setSize(300, 10);
         frame.setJMenuBar(menuBar);
         
         about = new JMenuItem("About");
@@ -91,16 +102,18 @@ public class App {
         menuBar.add(about);
         
         data = new JMenuItem("Data");
+        data.addActionListener(new DataAction());
         menuBar.add(data);
         
         expCSV = new JMenuItem("Export to CSV");
+        expCSV.addActionListener(new ExportToCSV());
         menuBar.add(expCSV);
+        
         
         //Popup menu
         popup = new JPopupMenu();
         delete = new JMenuItem("Delete Selected Item");
         delete.addActionListener(new DeleteSelected());
-        
         
         //Scrollable list
         
@@ -213,13 +226,119 @@ public class App {
         
         frame.add(detailsPanel, BorderLayout.EAST);
         
-        frame.setVisible(true);
         
+        
+        
+    }
+    
+    static String getData(){
+        ListModel<Artist> model = list.getModel();
+        if(model.getSize() == 0){
+            return "The list is empty";
+        }
+        
+        String data = "";
+        int songCount = 0;
+        
+        String oldestName = model.getElementAt(0).toString();
+        String youngestName = model.getElementAt(0).toString();
+        
+        String shortName = model.getElementAt(0).getSongs().get(0).getTitle();
+        int shortDuration = model.getElementAt(0).getSongs().get(0).getDuration();
+        String longName = model.getElementAt(0).getSongs().get(0).getTitle();
+        int longDuration  = model.getElementAt(0).getSongs().get(0).getDuration();
+        
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("d-MMM-yyyy");
+            Date oldestDate = sdf.parse(model.getElementAt(0).getDateOfBirth().replace(" ", "-"));
+            Date youngestDate = sdf.parse(model.getElementAt(0).getDateOfBirth().replace(" ", "-"));
+
+            for(int counter = 0; counter < model.getSize(); counter++){
+                Artist artist = model.getElementAt(counter);
+
+                Date dob = sdf.parse(artist.getDateOfBirth().replace(" ", "-"));
+
+                songCount += artist.getSongs().size();
+
+                if(oldestDate.compareTo(dob) > 0){
+                    oldestDate = dob;
+                    oldestName = artist.toString();
+                }
+
+                if(youngestDate.compareTo(dob) < 0){
+                    youngestDate = dob;
+                    youngestName = artist.toString();
+                }
+                
+                for(Song song:artist.getSongs()){
+                    if(song.getDuration() < shortDuration){
+                        shortDuration = song.getDuration();
+                        shortName = song.getTitle();
+                    }else if(song.getDuration() == shortDuration){
+                        shortName += (", " + song.getTitle());
+                    }
+                    
+                    if(song.getDuration() > longDuration){
+                        longDuration = song.getDuration();
+                        longName = song.getTitle();
+                    }else if(song.getDuration() == longDuration){
+                        longName += (", " + song.getTitle());
+                    }
+                }
+
+            }
+        }catch(ParseException pe){
+            System.out.println(pe.getMessage());
+        }
+        data += ("Number of artists: " + model.getSize());
+        data += ("\nTotal number of songs: " + songCount);
+        data += ("\nOldest artist is: " + oldestName);
+        data += ("\nYoungest artist is: " + youngestName);
+        data += ("\nShortest song names are: [" + shortName + "]");
+        data += ("\nLongest song names are: [" + longName + "]");
+        
+        return data;
     }
     
     static class AboutAction implements ActionListener{
         public void actionPerformed (ActionEvent e){
             JOptionPane.showMessageDialog(null, "Assignment 2 App v.0.1", "About", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    static class DataAction implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            JOptionPane.showMessageDialog(null, getData(), "Data Statistics", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    static class ExportToCSV implements ActionListener{
+        public void actionPerformed (ActionEvent e){
+            try(CSVWriter artistWriter = new CSVWriter(new FileWriter("resources/artists.csv"))){
+                String artistHeaders[] = {"artistID", "dob", "placeOfBirth"};
+                artistWriter.writeNext(artistHeaders);
+                ListModel<Artist> model = list.getModel();
+                for(int counter = 0; counter < model.getSize(); counter++){
+                    Artist artist = list.getModel().getElementAt(counter);
+                    String artistLine[] = {artist.getArtistID().toString(), artist.getDateOfBirth(), artist.getPlaceOfBirth()}; 
+                    artistWriter.writeNext(artistLine);
+                    try(CSVWriter songWriter = new CSVWriter(new FileWriter("resources/songs.csv"))){
+                        String songsHeaders[] = {"songId", "artistID", "title", "duration"};
+                        songWriter.writeNext(songsHeaders);
+                        for(Song song:artist.getSongs()){
+                            String songLine[] = {song.getSongID().toString(), song.getArtistID().toString(), song.getTitle(), String.valueOf(song.getDuration())};
+                            songWriter.writeNext(songLine);
+                        }
+                        songWriter.flush();
+                    }
+                }
+                artistWriter.flush();
+            }catch (IOException ioE){
+                System.out.println(ioE.getMessage());
+            }
+            
+            
+            
         }
     }
     
@@ -269,8 +388,8 @@ public class App {
             
             String songsText= "";
             int songCount = 1;
-            for(Song s:artist.getSongs()){
-                songsText += (songCount++ + ". " + s.getTitle() + " (" + s.getDuration() +")\n");
+            for(String s:Utils.returnSongDurationAndTitleFormatted(artist.getSongs()).values()){
+                songsText += (songCount++ + ". " + s);
             }
             
             
