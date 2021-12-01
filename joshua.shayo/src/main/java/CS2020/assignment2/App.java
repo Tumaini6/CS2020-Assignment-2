@@ -314,24 +314,25 @@ public class App {
     
     static class ExportToCSV implements ActionListener{
         public void actionPerformed (ActionEvent e){
-            try(CSVWriter artistWriter = new CSVWriter(new FileWriter("resources/artists.csv"))){
+            try{
+                CSVWriter artistWriter = new CSVWriter(new FileWriter("resources/artists.csv"));
+                CSVWriter songWriter = new CSVWriter(new FileWriter("resources/songs.csv"));
                 String artistHeaders[] = {"artistID", "dob", "placeOfBirth"};
+                String songsHeaders[] = {"songId", "artistID", "title", "duration"};
                 artistWriter.writeNext(artistHeaders);
+                songWriter.writeNext(songsHeaders);
                 ListModel<Artist> model = list.getModel();
                 for(int counter = 0; counter < model.getSize(); counter++){
                     Artist artist = list.getModel().getElementAt(counter);
                     String artistLine[] = {artist.getArtistID().toString(), artist.getDateOfBirth(), artist.getPlaceOfBirth()}; 
                     artistWriter.writeNext(artistLine);
-                    try(CSVWriter songWriter = new CSVWriter(new FileWriter("resources/songs.csv"))){
-                        String songsHeaders[] = {"songId", "artistID", "title", "duration"};
-                        songWriter.writeNext(songsHeaders);
-                        for(Song song:artist.getSongs()){
-                            String songLine[] = {song.getSongID().toString(), song.getArtistID().toString(), song.getTitle(), String.valueOf(song.getDuration())};
-                            songWriter.writeNext(songLine);
-                        }
-                        songWriter.flush();
+                    for(Song song:artist.getSongs()){
+                        String songLine[] = {song.getSongID().toString(), song.getArtistID().toString(), song.getTitle(), String.valueOf(song.getDuration())};
+                        songWriter.writeNext(songLine);
                     }
+                    
                 }
+                songWriter.flush();
                 artistWriter.flush();
             }catch (IOException ioE){
                 System.out.println(ioE.getMessage());

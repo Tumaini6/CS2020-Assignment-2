@@ -15,7 +15,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/zulu11-ca-amd64/lib"/>
-    <property name="sun.java.command" value="/home/codio/workspace/joshua.shayo/target/surefire/surefirebooter15005723427668051226.jar /home/codio/workspace/joshua.shayo/target/surefire 2021-11-30T21-35-20_962-jvmRun1 surefire3896445960566049396tmp surefire_010088125687549058120tmp"/>
+    <property name="sun.java.command" value="/home/codio/workspace/joshua.shayo/target/surefire/surefirebooter8710133985962318745.jar /home/codio/workspace/joshua.shayo/target/surefire 2021-12-01T14-48-30_636-jvmRun1 surefire6543944821142766315tmp surefire_011290957023708113335tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/home/codio/workspace/joshua.shayo/target/test-classes:/home/codio/workspace/joshua.shayo/target/classes:/home/codio/.m2/repository/junit/junit/4.11/junit-4.11.jar:/home/codio/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/codio/.m2/repository/org/xerial/sqlite-jdbc/3.15.1/sqlite-jdbc-3.15.1.jar:/home/codio/.m2/repository/com/opencsv/opencsv/4.4/opencsv-4.4.jar:/home/codio/.m2/repository/org/apache/commons/commons-text/1.3/commons-text-1.3.jar:/home/codio/.m2/repository/commons-beanutils/commons-beanutils/1.9.3/commons-beanutils-1.9.3.jar:/home/codio/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar:/home/codio/.m2/repository/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar:/home/codio/.m2/repository/org/apache/commons/commons-collections4/4.2/commons-collections4-4.2.jar:/home/codio/.m2/repository/org/apache/commons/commons-lang3/3.9/commons-lang3-3.9.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -32,7 +32,7 @@
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="jdk.vendor.version" value="Zulu11.52+13-CA"/>
     <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
-    <property name="surefire.real.class.path" value="/home/codio/workspace/joshua.shayo/target/surefire/surefirebooter15005723427668051226.jar"/>
+    <property name="surefire.real.class.path" value="/home/codio/workspace/joshua.shayo/target/surefire/surefirebooter8710133985962318745.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="11.0.13+8-LTS"/>
     <property name="user.name" value="codio"/>
